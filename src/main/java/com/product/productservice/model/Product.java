@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.lang.annotation.Documented;
 import java.math.BigDecimal;
 
 @Entity
@@ -16,7 +15,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 @Data
-public class Products {
+public class Product {
 
     private String Id;
     private String name;
