@@ -24,6 +24,7 @@ public class ProductServicesImpl implements ProductService {
         Product product = Product.builder()
                 .name(productRequest.getName())
                 .description(productRequest.getDescription())
+                .sku(productRequest.getSku())
                 .price(productRequest.getPrice())
                 .build();
         productRepository.save(product);
@@ -32,7 +33,7 @@ public class ProductServicesImpl implements ProductService {
 
     @Override
     public List<ProductResponse> getProducts(ProductResponse productResponse) {
-       List<Product> products =  productRepository.findAll();
+       List<Product> products = (List<Product>) productRepository.findAll();
        return products.stream().map(this::readProduct).collect(Collectors.toList());
     }
 
@@ -41,6 +42,7 @@ public class ProductServicesImpl implements ProductService {
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
+                .sku(product.getSku())
                 .price(product.getPrice())
                 .build();
     }

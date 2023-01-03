@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-//@RequestMapping("/api/products")
+//@RequestMapping(path = "/api/products")
 @RequiredArgsConstructor
 public class ProductController {
     @Autowired
@@ -31,4 +31,5 @@ public class ProductController {
     public List<ProductResponse> getAllProducts(ProductResponse productResponse){
       return productService.getProducts(productResponse);
     }
+    @PutMapping("sku={}")
 }

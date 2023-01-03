@@ -1,11 +1,12 @@
 package com.retailer.productservice.model;
 
-import jakarta.persistence.Entity;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 @Setter
 @Getter
 @NoArgsConstructor
@@ -13,9 +14,11 @@ import java.math.BigDecimal;
 @Builder
 @Entity
 public class Product {
-@Id
-private Integer id;
-private String name;
-private  String description;
-private BigDecimal price;
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Integer id;
+    private String name;
+    private  String description;
+    private String sku;
+    private BigDecimal price;
 }
