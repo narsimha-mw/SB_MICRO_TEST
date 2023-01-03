@@ -31,5 +31,4 @@ public class ProductController {
     public List<ProductResponse> getAllProducts(ProductResponse productResponse){
       return productService.getProducts(productResponse);
     }
-    @PutMapping("sku={}")
 }
