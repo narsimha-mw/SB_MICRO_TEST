@@ -10,15 +10,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/order")
 public class OrderServiceController {
     @Autowired
     OrderService orderService;
-    @GetMapping("/order/test")
+    @GetMapping("/test")
     public String show(){
         System.out.println("show order");
         return "this order service is up now..";
     }
-    @PostMapping("/order/placed")
+    @PostMapping("/placed")
     @ResponseStatus(HttpStatus.CREATED)
     public String placeOrder(@RequestBody OrderRequest orderRequest){
        orderService.placeTheOrder(orderRequest);
