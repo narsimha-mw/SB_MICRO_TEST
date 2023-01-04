@@ -49,7 +49,6 @@ public class OrderServiceImpl implements  OrderService{
                         .retrieve()
                                 .bodyToMono(InventoryResponse[].class)
                                         .block();
-
         boolean response = Arrays.stream(inventoryResponsesArray).allMatch(InventoryResponse::isInStock);
        if(response) {
            orderRepository.save(order);

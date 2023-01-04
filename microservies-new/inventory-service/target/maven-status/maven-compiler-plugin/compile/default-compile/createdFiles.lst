@@ -1,6 +1,7 @@
 com\retailer\dto\InventoryRequest.class
 com\retailer\InventoryServiceApplication.class
 com\retailer\model\Inventory.class
+com\retailer\dto\InventoryResponse$InventoryResponseBuilder.class
 com\retailer\services\InventoryServiceImpl.class
 com\retailer\dto\InventoryResponse.class
 com\retailer\controller\InventoryServiceController.class
