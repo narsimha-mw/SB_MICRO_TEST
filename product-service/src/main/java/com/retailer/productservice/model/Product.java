@@ -9,7 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 @Setter
 @Getter
-@NoArgsConstructor
+//@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
@@ -21,4 +21,8 @@ public class Product {
     private  String description;
     private String sku;
     private BigDecimal price;
+
+    public Product() {
+
+    }
 }

@@ -1,14 +1,13 @@
-package com.retailer.order.orderservice;
+package com.inventory.inventoryservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class OrderServiceApplication {
+public class InventoryServiceApplication {
 
 	public static void main(String[] args) {
-
-		System.err.println("Order services is up");
-		SpringApplication.run(OrderServiceApplication.class, args);
+		SpringApplication.run(InventoryServiceApplication.class, args);
 	}
+
 }
