@@ -1,4 +1,4 @@
-package com.retailer.dto.orderlineitems;
+package com.retailer.dto;
 
 import lombok.*;
 
@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Builder
 public class OrderLineItemResponse {
     private Long id;
-    private  String skuCode;
+    private  String sku;
     private BigDecimal price;
     private Integer quantity;
 }

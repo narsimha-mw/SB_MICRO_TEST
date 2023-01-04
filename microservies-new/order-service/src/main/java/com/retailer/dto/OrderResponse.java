@@ -1,4 +1,4 @@
-package com.retailer.dto.order;
+package com.retailer.dto;
 
 import com.retailer.model.OrderLineItems;
 import lombok.*;

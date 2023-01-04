@@ -19,7 +19,7 @@ public class ProductController {
     @GetMapping("/test")
     public  String show(){
         System.err.println("show message--------------------");
-        return  "server is running...";
+        return  "Product server is running...";
     }
     @PostMapping("/save")
     @ResponseStatus(HttpStatus.CREATED)

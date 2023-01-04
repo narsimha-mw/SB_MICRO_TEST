@@ -1,6 +1,6 @@
-package com.retailer.dto.order;
+package com.retailer.dto;
 
-import com.retailer.dto.orderlineitems.OrderLineItemRequest;
+import com.retailer.dto.OrderLineItemRequest;
 import lombok.*;
 
 import java.util.List;

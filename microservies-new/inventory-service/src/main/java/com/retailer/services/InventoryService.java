@@ -1,5 +1,9 @@
 package com.retailer.services;
 
+import com.retailer.dto.InventoryResponse;
+
+import java.util.List;
+
 public interface InventoryService {
-    boolean productInStock(String skuCode);
+    List<InventoryResponse> productInStock(List<String> sku);
 }

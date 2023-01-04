@@ -1,7 +1,7 @@
 package com.retailer.controller;
 
-import com.retailer.dto.order.OrderRequest;
-import com.retailer.dto.order.OrderResponse;
+import com.retailer.dto.OrderRequest;
+import com.retailer.dto.OrderResponse;
 import com.retailer.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,11 +24,4 @@ public class OrderServiceController {
        orderService.placeTheOrder(orderRequest);
        return  "Order Place success";
     }
-    @GetMapping("/orders/list")
-    @ResponseStatus(HttpStatus.OK)
-    public List<OrderResponse> getAllOrders(OrderResponse orderResponse){
-        return orderService.fetchAllOrders(orderResponse);
-
-    }
-
 }
