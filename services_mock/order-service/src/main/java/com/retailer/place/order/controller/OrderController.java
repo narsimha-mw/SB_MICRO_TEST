@@ -44,7 +44,11 @@ public class OrderController {
     public OrderResponse orderByName(@PathVariable(value = "name") String orderName){
         return orderService.getByOrderName(orderName);
     }
-
+@GetMapping("/orderId={id}&pay-status={message}")
+public OrderPaymentTransactionResponse filterByOrderPaymentStatus(@PathVariable(value = "id") Integer orderId,
+                                                                 @PathVariable(value = "message") String paymentStatus){
+        return orderService.filterByOrderPaymentStatus(orderId, paymentStatus);
+}
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
  public Order updateOrderBtId(@PathVariable(value = "id") Integer orderId, @RequestBody Order order){

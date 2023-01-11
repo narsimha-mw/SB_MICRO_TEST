@@ -14,7 +14,7 @@ import lombok.*;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
     @Column(name = "name")
     private String orderName;

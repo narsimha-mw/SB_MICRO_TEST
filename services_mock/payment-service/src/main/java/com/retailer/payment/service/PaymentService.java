@@ -13,4 +13,6 @@ public interface PaymentService {
     PaymentResponse getByPaymentTnId(String paymentTransactionId);
 
     PaymentResponse filterByPaymentTransactionStatus(String status);
+
+    PaymentResponse filterByOrderPaymentStatus(Integer orderId, String status);
 }

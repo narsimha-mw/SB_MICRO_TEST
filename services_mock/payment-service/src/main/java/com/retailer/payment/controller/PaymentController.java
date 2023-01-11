@@ -37,6 +37,14 @@ public class PaymentController {
     @GetMapping("/status={message}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public PaymentResponse getPaymentTransactionStatus(@PathVariable(value = "message") String status){
+        System.err.println("restAPI call"+status);
         return paymentService.filterByPaymentTransactionStatus(status);
+    }
+    @GetMapping("/orderId={id}&status={message}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public PaymentResponse getOrderPaymentStatus(@PathVariable(value = "id") Integer orderId,
+                                                 @PathVariable(value = "message") String status){
+        System.err.println("restAPI call"+status+ " ;"+orderId);
+        return paymentService.filterByOrderPaymentStatus(orderId,status);
     }
 }

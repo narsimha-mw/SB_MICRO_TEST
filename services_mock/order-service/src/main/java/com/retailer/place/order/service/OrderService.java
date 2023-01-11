@@ -19,4 +19,6 @@ public interface OrderService {
     OrderResponse getByOrderName(String orderName);
 
     OrderPaymentTransactionResponse savedOrder(OrderPaymentTransactionRequest request);
+
+    OrderPaymentTransactionResponse filterByOrderPaymentStatus(Integer orderId, String paymentStatus);
 }

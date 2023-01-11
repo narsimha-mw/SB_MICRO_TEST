@@ -5,6 +5,7 @@ import com.retailer.payment.model.Payment;
 import com.retailer.payment.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Random;
@@ -15,7 +16,8 @@ import java.util.stream.Collectors;
 public class PaymentServiceImpl implements  PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
-
+    @Autowired
+    private RestTemplate restTemplate;
     @Override
     public Payment doPayment(Payment payment) {
         String paymentStatus = new Random().nextBoolean() ? "success" : "failur";
@@ -35,7 +37,7 @@ public class PaymentServiceImpl implements  PaymentService {
     @Override
     public PaymentResponse getByPaymentTnId(String paymentTransactionId) {
         System.err.println("id=" + paymentTransactionId);
-        Payment tnId = paymentRepository.getByPaymentTransactionId(paymentTransactionId);
+        Payment tnId = paymentRepository.getByPaymentTransactionIdIgnoreCase(paymentTransactionId);
         System.err.println("paymentTransactionId" + tnId);
         if (tnId != null) {
             return PaymentResponse.builder()
@@ -50,12 +52,24 @@ public class PaymentServiceImpl implements  PaymentService {
 
     @Override
     public PaymentResponse filterByPaymentTransactionStatus(String status) {
-       List <Payment> response = paymentRepository.findAllByPaymentStatus(status);
+       List <Payment> response = paymentRepository.findAllByPaymentStatusIgnoreCase(status);
        response.forEach(e->System.err.println(e.getPaymentStatus()));
         List<Payment> filterResponse = response.stream().map(this::mapToPaymentStatus).collect(Collectors.toList());
         return PaymentResponse.builder()
                 .allPaymentStatus(filterResponse)
                 .build();
+    }
+
+    @Override
+    public PaymentResponse filterByOrderPaymentStatus(Integer orderId, String status) {
+         Payment response = paymentRepository.findByOrderIdAndPaymentStatus(orderId, status);
+         return PaymentResponse.builder()
+                 .id(response.getId())
+                 .totalAmount(response.getOrderAmount())
+                 .orderId(response.getOrderId())
+                 .transactionStatus(response.getPaymentStatus())
+                 .paymentTransactionId(response.getPaymentTransactionId())
+                 .build();
     }
 
     private Payment mapToPaymentStatus(Payment payment) {

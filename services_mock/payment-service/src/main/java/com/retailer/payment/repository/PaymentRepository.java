@@ -9,7 +9,11 @@ import java.util.List;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment,Integer> {
-    Payment getByPaymentTransactionId(String paymentTransactionId);
+    Payment getByPaymentTransactionIdIgnoreCase(String paymentTransactionId);
 
-    List<Payment> findAllByPaymentStatus(String status);
+    List<Payment> findAllByPaymentStatusIgnoreCase(String status);
+
+    Payment findByOrderId(Integer orderId);
+
+    Payment findByOrderIdAndPaymentStatus(Integer orderId, String status);
 }

@@ -2,6 +2,8 @@ package com.retailer.place.order.common;
 
 import lombok.*;
 
+import java.util.List;
+
 
 @Setter
 @Getter
@@ -14,4 +16,5 @@ public class Payment {
     private String paymentTransactionId;
     private int orderId;
     private Double orderAmount;
+//    private List<Object> dump;
 }

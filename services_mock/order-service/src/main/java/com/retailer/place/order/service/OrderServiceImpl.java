@@ -7,7 +7,6 @@ import com.retailer.place.order.dto.OrderPaymentTransactionResponse;
 import com.retailer.place.order.model.Order;
 import com.retailer.place.order.repository.OrderRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -17,49 +16,63 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class OrderServiceImpl implements  OrderService{
+public class OrderServiceImpl implements OrderService{
+    private static final String PAYMENT_BASE_URL = "http://localhost:2001/api/v2/payment";
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
     private RestTemplate restTemplate;
     @Autowired
     private EntityManager entityManager;
-    private OrderServiceImpl(OrderRepository orderRepository, RestTemplate restTemplate) {
-        this.orderRepository = orderRepository;
-        this.restTemplate = restTemplate;
-    }
 
     public OrderPaymentTransactionResponse savedOrder(OrderPaymentTransactionRequest request){
         Order o= request.getOrder();
-        System.err.println("request:="+o.getId()+";"+o.getOrderName()+";"+o.getQuantity()+";"+o.getPrice());
-
         String message = null;
         Order order = request.getOrder();
-        orderRepository.save(order);
-        Payment payment = request.getPayment();
-//        payment.setOrderId(order.getId());
-        payment.setOrderId(106);
-        payment.setOrderAmount(order.getPrice());
-   // call Payment APi using REST Template
-        Payment responseAPI = restTemplate.postForObject("http://localhost:2001/api/v2/payment/pay",
-                payment, Payment.class);
-       System.err.println("responseAPI:="+responseAPI);
-        if(responseAPI.getPaymentStatus().equals("success")) {
-//            orderRepository.save(order);
-            message = "This Order payment was successfully"+ order.getOrderName() + " and transactionId"+payment.getPaymentTransactionId();
+        Order ord = orderRepository.save(order);
+        if(ord.getId()!=null){
+            System.err.println("ord= "+ord);
         }else{
-            message = "This Order payment was failure"+ order.getOrderName() + " and transactionId"+payment.getPaymentTransactionId();
-        }
-         return OrderPaymentTransactionResponse.builder()
-                 .order(order)
-                 .payment(responseAPI)
-                 .message(message)
-                 .build();
-    }
+            System.err.println("ord is null= "+ord);
 
+        }
+        Order lastRowOrder = orderRepository.findTopByOrderByIdDesc();
+        System.err.println("lastRowOrder="+ lastRowOrder.getId()+";"+lastRowOrder.getOrderName());
+        Payment responseAPI =null;
+        if(lastRowOrder!=null) {
+            Payment payment = request.getPayment();
+        payment.setOrderId(lastRowOrder.getId());
+            payment.setOrderAmount(lastRowOrder.getPrice());
+            // call Payment APi using REST Template
+            responseAPI = restTemplate.postForObject(PAYMENT_BASE_URL+"/pay",
+                    payment, Payment.class);
+            assert responseAPI != null;
+            if (responseAPI.getPaymentStatus().equals("success")) {
+//            orderRepository.save(order);
+                message = "This Order payment was successfully" + order.getOrderName() + " and transactionId" + payment.getPaymentTransactionId();
+            } else {
+                message = "This Order payment was failure" + order.getOrderName() + " and transactionId" + payment.getPaymentTransactionId();
+            }
+
+            return OrderPaymentTransactionResponse.builder()
+                    .order(order)
+                    .payment(responseAPI)
+                    .message(message)
+                    .build();
+        }
+        return null;
+    }
+// match with orderId along with more than one paymentStatus response
+    @Override
+    public OrderPaymentTransactionResponse filterByOrderPaymentStatus(Integer orderId, String paymentStatus) {
+        List<Payment> apiResponse = restTemplate.getForObject(PAYMENT_BASE_URL + "/orderId="
+                        + orderId + "&status=" + paymentStatus, List.class);
+        System.err.println("apiResponse: " + apiResponse.size());
+        return OrderPaymentTransactionResponse.builder()
+                .paymentList(apiResponse)
+                .build();
+    }
     public Order saveOrder(Order request){
-//        Order order = orderRepository.getLastRecordOfRow();
-        System.err.println(request.getOrderName());
         return orderRepository.save(request);
          }
 
@@ -81,6 +94,7 @@ public class OrderServiceImpl implements  OrderService{
        return OrderResponse.builder()
                         .orders(placeOrders)
                          .build();
+
     }
 
     private Order placeOrderItems(Order placeOrder) {
@@ -93,10 +107,9 @@ public class OrderServiceImpl implements  OrderService{
     }
 
     public Order updateOrderBtId(Integer orderId, Order order){
-        Optional<Order> orderIdExists = orderRepository.findById(orderId);
-        if(orderIdExists.isPresent()) {
+//        Optional<Order> orderIdExists = orderRepository.findById(orderId);
+        if(getFindByOrderId(orderId)) {
             Order placeOrder = orderRepository.findById(orderId).get();
-            System.err.println("placeOrder"+placeOrder);
             placeOrder.setOrderName(order.getOrderName());
             placeOrder.setPrice(order.getPrice());
             placeOrder.setQuantity(order.getQuantity());
@@ -108,13 +121,14 @@ public class OrderServiceImpl implements  OrderService{
 
     @Override
     public String deleteByOrder(String orderName) {
-        Order orderNames = orderRepository.findByOrderName(orderName);
+        Order orderNames = orderRepository.findByOrderNameIgnoreCase(orderName);
         orderRepository.deleteById(orderNames.getId());
         return "THis Order is deleted successfully "+orderNames.getOrderName();
-
     }
 
-    public void deleteByOrder(Integer orderId){
-        orderRepository.deleteById(orderId);
+    private Boolean getFindByOrderId(Integer orderId){
+        Optional<Order> orderIdResponse = orderRepository.findById(orderId);
+        return orderIdResponse.isPresent() ? true : false;
     }
+
 }

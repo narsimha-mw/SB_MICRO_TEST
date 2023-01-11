@@ -1,7 +1,10 @@
 package com.retailer.payment.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.io.Serializable;
 
 @Entity
 @Setter
@@ -10,7 +13,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "PAYMENT")
-public class Payment {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Payment  implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
