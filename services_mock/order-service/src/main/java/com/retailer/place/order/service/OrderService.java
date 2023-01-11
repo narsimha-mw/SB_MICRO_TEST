@@ -1,18 +1,22 @@
 package com.retailer.place.order.service;
 
 import com.retailer.place.order.dto.OrderResponse;
-import com.retailer.place.order.model.PlaceOrder;
+import com.retailer.place.order.dto.OrderPaymentTransactionRequest;
+import com.retailer.place.order.dto.OrderPaymentTransactionResponse;
+import com.retailer.place.order.model.Order;
 
 import java.util.List;
 
 public interface OrderService {
-    PlaceOrder saveOrder(PlaceOrder order);
+    Order saveOrder(Order request);
 
-    List<PlaceOrder> fetchAllOrders();
+    List<Order> fetchAllOrders();
     OrderResponse getByOrderId(String orderId);
 
-    PlaceOrder updateOrderBtId(Integer orderId, PlaceOrder order);
-    void deleteByOrder(Integer orderId);
+    Order updateOrderBtId(Integer orderId, Order order);
+    String deleteByOrder(String orderId);
 
     OrderResponse getByOrderName(String orderName);
+
+    OrderPaymentTransactionResponse savedOrder(OrderPaymentTransactionRequest request);
 }

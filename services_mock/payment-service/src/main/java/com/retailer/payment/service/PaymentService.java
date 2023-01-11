@@ -10,7 +10,7 @@ public interface PaymentService {
 
     List<Payment> getAllPayments();
 
-    Payment getPaymentStatus(String paymentStatus);
-
     PaymentResponse getByPaymentTnId(String paymentTransactionId);
+
+    PaymentResponse filterByPaymentTransactionStatus(String status);
 }

@@ -8,15 +8,18 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "PAYMENT")
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @NonNull
     @Column(name = "pay_status")
     private String paymentStatus;
     @Column(name = "pay_tnsID")
-    @NonNull
     private String paymentTransactionId;
+    @NonNull
+    private int orderId;
+    @Column(name = "total_amt")
+    private Double orderAmount;
 }

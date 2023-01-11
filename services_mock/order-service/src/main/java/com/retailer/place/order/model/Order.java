@@ -10,11 +10,11 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name ="place_order")
-public class PlaceOrder {
+@Table(name = "all_items")
+public class Order {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
     private Integer id;
     @Column(name = "name")
     private String orderName;

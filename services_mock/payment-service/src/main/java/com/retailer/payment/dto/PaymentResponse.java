@@ -1,6 +1,9 @@
 package com.retailer.payment.dto;
 
+import com.retailer.payment.model.Payment;
 import lombok.*;
+
+import java.util.List;
 
 @Setter
 @Getter
@@ -13,4 +16,5 @@ public class PaymentResponse {
     private String paymentStatus;
 
     private String transactionStatus;
+    private List<Payment> allPaymentStatus;
 }

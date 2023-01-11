@@ -34,5 +34,9 @@ public class PaymentController {
     public PaymentResponse getPaymentTransaction(@PathVariable(value = "id") String paymentTransactionId){
         return paymentService.getByPaymentTnId(paymentTransactionId);
     }
-
+    @GetMapping("/status={message}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public PaymentResponse getPaymentTransactionStatus(@PathVariable(value = "message") String status){
+        return paymentService.filterByPaymentTransactionStatus(status);
+    }
 }
