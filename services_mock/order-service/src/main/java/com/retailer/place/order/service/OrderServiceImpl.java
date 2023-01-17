@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService{
-    private static final String PAYMENT_BASE_URL = "http://localhost:2001/api/v2/payment";
+    private static final String PAYMENT_BASE_URL = "http://PAYMENT-SERVICE/api/v2/payment";
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
