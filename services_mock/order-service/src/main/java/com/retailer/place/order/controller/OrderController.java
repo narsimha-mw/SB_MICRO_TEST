@@ -5,6 +5,7 @@ import com.retailer.place.order.dto.OrderPaymentTransactionRequest;
 import com.retailer.place.order.dto.OrderPaymentTransactionResponse;
 import com.retailer.place.order.model.Order;
 import com.retailer.place.order.service.OrderService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+    private  static  final  String FALL_BACK_ORDER_SERVICES= "orderService";
     @GetMapping("/test-server")
     @ResponseStatus(HttpStatus.OK)
     public String testServer(){
@@ -24,9 +26,19 @@ public class OrderController {
     }
 
     @PostMapping("/save-order")
-        public OrderPaymentTransactionResponse saveOrder(@RequestBody OrderPaymentTransactionRequest request){
+    @CircuitBreaker(name = FALL_BACK_ORDER_SERVICES,fallbackMethod = "callSaveOrderService")
+    public OrderPaymentTransactionResponse saveOrder(@RequestBody OrderPaymentTransactionRequest request){
             return orderService.savedOrder(request);
     }
+
+    public OrderPaymentTransactionResponse filterByOrderIdOrderService(Exception e){
+        return  OrderPaymentTransactionResponse.builder().build();
+    }
+
+    public OrderPaymentTransactionResponse callSaveOrderService(Exception e){
+        return  OrderPaymentTransactionResponse.builder().build();
+    }
+
     @PostMapping("/save")
     public Order saveOrder(@RequestBody Order order){
         System.err.println("service save REST call...");
@@ -39,6 +51,7 @@ public class OrderController {
     public List<Order> fetchAllOrders(){
        return orderService.fetchAllOrders();
     }
+
     @GetMapping("/name={name}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public OrderResponse orderByName(@PathVariable(value = "name") String orderName){
