@@ -6,10 +6,13 @@ import com.retailer.place.order.dto.OrderPaymentTransactionResponse;
 import com.retailer.place.order.model.Order;
 import com.retailer.place.order.service.OrderService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -24,14 +27,19 @@ public class OrderController {
     public String testServer(){
         return "orderService is up now today....";
     }
-
+    int count=1;
     @PostMapping("/save-order")
-    @CircuitBreaker(name = FALL_BACK_ORDER_SERVICES,fallbackMethod = "callSaveOrderService")
+//    @CircuitBreaker(name = FALL_BACK_ORDER_SERVICES,fallbackMethod = "callSaveOrderService")
+//    @Retry(name = FALL_BACK_ORDER_SERVICES,fallbackMethod = "callSaveOrderService")
+    @RateLimiter(name = FALL_BACK_ORDER_SERVICES,fallbackMethod = "callSaveOrderService") // wait until time next call
     public OrderPaymentTransactionResponse saveOrder(@RequestBody OrderPaymentTransactionRequest request){
+
+        System.out.println("Retry API flow"+ count++ + "time at "+ new Date());
             return orderService.savedOrder(request);
     }
 
     public OrderPaymentTransactionResponse filterByOrderIdOrderService(Exception e){
+
         return  OrderPaymentTransactionResponse.builder().build();
     }
 
