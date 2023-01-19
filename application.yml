@@ -1,0 +1,30 @@
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://localhost:3306/warehouse?useSSL=false
+    username: root
+    password: root
+    driverClassName: com.mysql.cj.jdbc.Driver
+  application:
+    name: ORDER-SERVICE
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:2000/eureka/
+
+microservices:
+  payment-service:
+    endpoints:
+      uri: http://PAYMENT-SERVICE/api/v2/payment/pay
+  order-service:
+    endpoints:
+      uri: http://ORDER-SERVICE/api/v2/order/all
