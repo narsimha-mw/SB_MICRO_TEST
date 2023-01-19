@@ -21,7 +21,13 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:2000/eureka/
 
-
+microservices:
+  payment-service:
+    endpoints:
+      uri: http://PAYMENT-SERVICE/api/v2/payment/pay
+  order-service:
+    endpoints:
+      uri: http://ORDER-SERVICE/api/v2/order/all
 server:
   port: 2002
 
