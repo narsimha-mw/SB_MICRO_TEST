@@ -31,7 +31,7 @@ public class OrderController {
     @PostMapping("/save-order")
 //    @CircuitBreaker(name = FALL_BACK_ORDER_SERVICES,fallbackMethod = "callSaveOrderService")
 //    @Retry(name = FALL_BACK_ORDER_SERVICES,fallbackMethod = "callSaveOrderService")
-    @RateLimiter(name = FALL_BACK_ORDER_SERVICES,fallbackMethod = "callSaveOrderService") // wait until time next call
+//    @RateLimiter(name = FALL_BACK_ORDER_SERVICES,fallbackMethod = "callSaveOrderService") // wait until time next call
     public OrderPaymentTransactionResponse saveOrder(@RequestBody OrderPaymentTransactionRequest request){
 
         System.out.println("Retry API flow"+ count++ + "time at "+ new Date());
