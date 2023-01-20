@@ -1,0 +1,22 @@
+
+spring:
+  application:
+    name: CONFIG-SERVER
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/narsimha-mw/SB_MICRO_TEST
+
+server:
+  port: 2001
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:2000/eureka/
+      

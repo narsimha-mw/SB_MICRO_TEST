@@ -8,6 +8,9 @@ import com.retailer.place.order.model.Order;
 import com.retailer.place.order.repository.OrderRepository;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,18 +19,23 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RefreshScope
 public class OrderServiceImpl implements OrderService{
-    private static final String PAYMENT_BASE_URL = "http://PAYMENT-SERVICE/api/v2/payment";
+    @Value("${microservices.payment-service.endpoints.uri}")
+    private static String PAYMENT_BASE_URL ;
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
+    @Lazy
     private RestTemplate restTemplate;
     @Autowired
     private EntityManager entityManager;
+    Payment responseAPI =null;
+    String message = null;
+
 
     public OrderPaymentTransactionResponse savedOrder(OrderPaymentTransactionRequest request){
         Order o= request.getOrder();
-        String message = null;
         Order order = request.getOrder();
         Order ord = orderRepository.save(order);
         if(ord.getId()!=null){
@@ -38,13 +46,12 @@ public class OrderServiceImpl implements OrderService{
         }
         Order lastRowOrder = orderRepository.findTopByOrderByIdDesc();
         System.err.println("lastRowOrder="+ lastRowOrder.getId()+";"+lastRowOrder.getOrderName());
-        Payment responseAPI =null;
         if(lastRowOrder!=null) {
             Payment payment = request.getPayment();
         payment.setOrderId(lastRowOrder.getId());
             payment.setOrderAmount(lastRowOrder.getPrice());
             // call Payment APi using REST Template
-            responseAPI = restTemplate.postForObject(PAYMENT_BASE_URL+"/pay",
+            responseAPI = restTemplate.postForObject(PAYMENT_BASE_URL,
                     payment, Payment.class);
             assert responseAPI != null;
             if (responseAPI.getPaymentStatus().equals("success")) {
