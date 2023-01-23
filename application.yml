@@ -5,12 +5,10 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:mysql://localhost:3306/warehouse?useSSL=false
+    url: jdbc:mysql://localhost:3306/retailer?useSSL=false
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
-  application:
-    name: ORDER-SERVICE
 
 eureka:
   instance:
