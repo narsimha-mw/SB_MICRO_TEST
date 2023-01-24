@@ -1,9 +1,8 @@
-package com.retailer.place.order.model;
+package com.retailer.order.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
-
 
 @Entity
 @Setter
@@ -11,14 +10,13 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "all_items")
-public class Order {
-
+@Table(name = "product_orders")
+public class ProductOrder {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id;
     @Column(name = "order_no")
-    @JsonIgnoreProperties
+//    @JsonIgnoreProperties
     private Long orderNumber;
     @Column(name = "name")
     private String productName;

@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 @Service
 @RefreshScope
 public class OrderServiceImpl implements OrderService{
-    @Value("${microservices.payment-service.endpoints.uri}")
-    private static String PAYMENT_BASE_URL ;
+//    @Value("${microservices.payment-service.endpoints.uri}")
+    private static final String PAYMENT_BASE_URL = "http://PAYMENT-SERVICE/api/v2/payment/pay";
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
@@ -45,7 +45,7 @@ public class OrderServiceImpl implements OrderService{
 
         }
         Order lastRowOrder = orderRepository.findTopByOrderByIdDesc();
-        System.err.println("lastRowOrder="+ lastRowOrder.getId()+";"+lastRowOrder.getOrderName());
+        System.err.println("lastRowOrder="+ lastRowOrder.getId()+";"+lastRowOrder.getProductName());
         if(lastRowOrder!=null) {
             Payment payment = request.getPayment();
         payment.setOrderId(lastRowOrder.getId());
@@ -56,9 +56,9 @@ public class OrderServiceImpl implements OrderService{
             assert responseAPI != null;
             if (responseAPI.getPaymentStatus().equals("success")) {
 //            orderRepository.save(order);
-                message = "This Order payment was successfully" + order.getOrderName() + " and transactionId" + payment.getPaymentTransactionId();
+                message = "This Order payment was successfully" + order.getProductName() + " and transactionId" + payment.getPaymentTransactionId();
             } else {
-                message = "This Order payment was failure" + order.getOrderName() + " and transactionId" + payment.getPaymentTransactionId();
+                message = "This Order payment was failure" + order.getProductName() + " and transactionId" + payment.getPaymentTransactionId();
             }
 
             return OrderPaymentTransactionResponse.builder()
@@ -107,7 +107,7 @@ public class OrderServiceImpl implements OrderService{
     private Order placeOrderItems(Order placeOrder) {
         return Order.builder()
                         .id(placeOrder.getId())
-                        .orderName(placeOrder.getOrderName())
+                        .productName(placeOrder.getProductName())
                         .price(placeOrder.getPrice())
                         .quantity(placeOrder.getQuantity())
                         .build();
@@ -117,7 +117,7 @@ public class OrderServiceImpl implements OrderService{
 //        Optional<Order> orderIdExists = orderRepository.findById(orderId);
         if(getFindByOrderId(orderId)) {
             Order placeOrder = orderRepository.findById(orderId).get();
-            placeOrder.setOrderName(order.getOrderName());
+            placeOrder.setProductName(order.getProductName());
             placeOrder.setPrice(order.getPrice());
             placeOrder.setQuantity(order.getQuantity());
             return orderRepository.save(placeOrder);
@@ -130,7 +130,7 @@ public class OrderServiceImpl implements OrderService{
     public String deleteByOrder(String orderName) {
         Order orderNames = orderRepository.findByOrderNameIgnoreCase(orderName);
         orderRepository.deleteById(orderNames.getId());
-        return "THis Order is deleted successfully "+orderNames.getOrderName();
+        return "THis Order is deleted successfully "+orderNames.getProductName();
     }
 
     private Boolean getFindByOrderId(Integer orderId){
