@@ -10,11 +10,10 @@ public interface PaymentService {
 
     List<Payment> getAllPayments();
 
-    PaymentResponse getByPaymentTnId(String paymentTransactionId);
+    PaymentResponse filterByOrderPaymentStatus(Integer orderId, Boolean status);
 
-    PaymentResponse filterByPaymentTransactionStatus(String status);
+//    PaymentResponse getByPaymentTnId(String paymentTransactionId);
 
-    PaymentResponse filterByOrderPaymentStatus(Integer orderId, String status);
+//    PaymentResponse filterByPaymentTransactionStatus(Boolean status);
 
-    PaymentResponse filterByOrderPaymentStatusApplied(Integer orderId, String status);
 }

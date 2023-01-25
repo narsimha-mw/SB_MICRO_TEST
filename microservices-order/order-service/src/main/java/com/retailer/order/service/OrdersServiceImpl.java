@@ -1,11 +1,11 @@
 package com.retailer.order.service;
 
 import com.retailer.order.common.Payment;
-import com.retailer.order.common.PaymentStatus;
 import com.retailer.order.dto.OrderPaymentTransactionRequest;
 import com.retailer.order.dto.OrderPaymentTransactionResponse;
 import com.retailer.order.model.ProductOrder;
 import com.retailer.order.repository.OrdersRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Lazy;
@@ -13,10 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RefreshScope
+@Slf4j
 public class OrdersServiceImpl implements  OrdersService{
     private static final String PAYMENT_BASE_URL = "http://PAYMENT-SERVICE/api/v2/payment/pay";
     @Autowired
@@ -26,43 +28,28 @@ public class OrdersServiceImpl implements  OrdersService{
     private RestTemplate restTemplate;
     Payment responseAPI =null;
     String message = null;
-//    private final String UNPAID= "unPaid";
-//    @Override
-//    public OrderPaymentTransactionResponse saveOrder(OrderPaymentTransactionRequest request) {
-//        ProductOrder o= request.getProductOrder();
-//        ProductOrder order = request.getProductOrder();
-//        ProductOrder ord = orderRepository.save(order);
-//        if(ord.getId()!=null){
-//            System.err.println("ord= "+ord);
-//        }else{
-//            System.err.println("ord is null= "+ord);
-//
-//        }
-//        ProductOrder lastRowOrder = orderRepository.findTopByOrderByIdDesc();
-//        System.err.println("lastRowOrder="+ lastRowOrder.getId()+";"+lastRowOrder.getProductName());
-//        if(lastRowOrder!=null) {
-//            Payment payment = request.getPayment();
-//            payment.setOrderId(lastRowOrder.getId());
-//            payment.setOrderAmount(lastRowOrder.getPrice());
-//            // call Payment APi using REST Template
-//            responseAPI = restTemplate.postForObject(PAYMENT_BASE_URL,
-//                    payment, Payment.class);
-//            assert responseAPI != null;
-//            if (responseAPI.getPaymentStatus().equals("success")) {
-////            orderRepository.save(order);
-//                message = "This Order payment was successfully" + order.getProductName() + " and transactionId" + payment.getPaymentTransactionId();
-//            } else {
-//                message = "This Order payment was failure" + order.getProductName() + " and transactionId" + payment.getPaymentTransactionId();
-//            }
-//            return OrderPaymentTransactionResponse.builder()
-//                    .productOrder(order)
-//                    .payment(responseAPI)
-//                    .message(message)
-//                    .build();
-//        }
-//        return null;
-//    }
+    @Override
+    public OrderPaymentTransactionResponse filterByOrderPaymentStatus(Integer orderId, Boolean paymentStatus) {
+        System.err.println(" order update status API call filterByOrderPaymentStatus: " + orderId + " status: "+paymentStatus);
+    if(getFindByOrderId(orderId).isPresent()){
+    ProductOrder order = getFindByOrderId(orderId).get();
+    order.setOrderNumber(order.getOrderNumber());
+    order.setPrice(order.getPrice());
+    order.setQuantity(order.getQuantity());
+    order.setProductName(order.getProductName());
+    order.setPaymentStatus(paymentStatus);
+    System.err.println(" order update status API call :" + order.getPaymentStatus()+","+order.getOrderNumber());
 
+    orderRepository.save(order);
+    return OrderPaymentTransactionResponse.builder().message("Order/payment status updates success")
+            .build();
+}
+      return OrderPaymentTransactionResponse.builder().message("Order Payment status updated").build();
+   }
+    private Optional<ProductOrder> getFindByOrderId(Integer orderId){
+      return orderRepository.findByOrderNumber(orderId);
+
+    }
     @Override
     public List<ProductOrder> fetchAllOrders() {
         return orderRepository.findAll();
@@ -70,33 +57,30 @@ public class OrdersServiceImpl implements  OrdersService{
 
     @Override
     public OrderPaymentTransactionResponse savedOrder(OrderPaymentTransactionRequest request) {
-        ProductOrder o= request.getProductOrder();
         ProductOrder order = request.getProductOrder();
         int orderNumber = ThreadLocalRandom.current().nextInt(100000, 1000000);
-        order.setOrderNumber((long) orderNumber);
-        order.setPaymentStatus(PaymentStatus.UNPAID);
-        ProductOrder ord = orderRepository.save(order);
-        if(ord.getId()!=null){
-            System.err.println("ord= "+ord);
-        }else{
-            System.err.println("ord is null= "+ord);
-
-        }
+        order.setOrderNumber(orderNumber);
+        order.setPaymentStatus(false);
+        orderRepository.save(order);
         ProductOrder lastRowOrder = orderRepository.findTopByOrderByIdDesc();
         System.err.println("lastRowOrder="+ lastRowOrder.getId()+";"+lastRowOrder.getProductName());
+        log.info("lastRowOrder=", lastRowOrder.getId()+" product name: "+lastRowOrder.getProductName());
+
         if(lastRowOrder!=null) {
+            System.err.println("Order row: "+ order.getPaymentStatus());
             Payment payment = request.getPayment();
-            payment.setOrderId(lastRowOrder.getId());
+            payment.setOrderId(order.getOrderNumber());
             payment.setOrderAmount(lastRowOrder.getPrice());
+            payment.setPaymentStatus(order.getPaymentStatus());
+            System.err.println("Payment obj: "+ payment.getPaymentStatus()+" id: "+payment.getOrderId()
+            + "status: "+ payment.getPaymentStatus());
             // call Payment APi using REST Template
-            responseAPI = restTemplate.postForObject(PAYMENT_BASE_URL,
+           Payment responseAPI = restTemplate.postForObject(PAYMENT_BASE_URL,
                     payment, Payment.class);
-            assert responseAPI != null;
-            if (responseAPI.getPaymentStatus().equals("success")) {
-//            orderRepository.save(order);
-                message = "This Order payment was successfully" + order.getProductName() + " and transactionId" + payment.getPaymentTransactionId();
+            if (!responseAPI.getPaymentStatus()) {
+                message = "This Order placed and no payment" +responseAPI.getOrderId() +"and transactionId" + payment.getPaymentTransactionId();
             } else {
-                message = "This Order payment was failure" + order.getProductName() + " and transactionId" + payment.getPaymentTransactionId();
+                message = "This Order payment was success" + responseAPI.getOrderId() + " and transactionId" + payment.getPaymentTransactionId();
             }
             return OrderPaymentTransactionResponse.builder()
                     .productOrder(order)
@@ -107,13 +91,4 @@ public class OrdersServiceImpl implements  OrdersService{
         return null;
     }
 
-//    @Override
-//    public OrdersResponse getByOrderId(String orderId) {
-//        return null;
-//    }
-
-//    @Override
-//    public OrdersResponse getByOrderId(String orderId) {
-//        return null;
-//    }
 }

@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 public class Payment {
     private Integer id;
-    private String paymentStatus;
+    private Boolean paymentStatus;
     private String paymentTransactionId;
     private int orderId;
     private Double orderAmount;

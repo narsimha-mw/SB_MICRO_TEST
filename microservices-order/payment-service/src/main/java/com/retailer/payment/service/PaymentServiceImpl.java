@@ -1,8 +1,10 @@
 package com.retailer.payment.service;
 
+import com.retailer.payment.common.ProductOrder;
 import com.retailer.payment.dto.PaymentResponse;
 import com.retailer.payment.model.Payment;
 import com.retailer.payment.repository.PaymentRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -13,82 +15,58 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
-public class PaymentServiceImpl implements  PaymentService {
+@Slf4j
+public class PaymentServiceImpl implements PaymentService {
+    private static final String ORDER_BASE_URL = "http://ORDER-SERVICE/api/v2/order/orderId={id}&pay-status={message}";
+
     @Autowired
     private PaymentRepository paymentRepository;
     @Autowired
     private RestTemplate restTemplate;
+
     @Override
     public Payment doPayment(Payment payment) {
-        String paymentStatus = new Random().nextBoolean() ? "success" : "failur";
+        System.err.println("viva doPayment payment service call"+ payment.getPaymentStatus()+""+payment.getOrderAmount());
+        log.info("viva doPayment payment service call", payment.getPaymentStatus(),payment.getOrderAmount());
         int tnxId = ThreadLocalRandom.current().nextInt(100000, 1000000);
-
         payment.setPaymentTransactionId("TX" + tnxId);
-        payment.setPaymentStatus(paymentStatus);
+        System.err.println("payment object"+ payment.getPaymentStatus());
+        log.info("payment object", payment.getPaymentStatus());
         return paymentRepository.save(payment);
     }
-
     @Override
     public List<Payment> getAllPayments() {
         return paymentRepository.findAll();
     }
-
-
+//this one valid
     @Override
-    public PaymentResponse getByPaymentTnId(String paymentTransactionId) {
-        System.err.println("id=" + paymentTransactionId);
-        Payment tnId = paymentRepository.getByPaymentTransactionIdIgnoreCase(paymentTransactionId);
-        System.err.println("paymentTransactionId" + tnId);
-        if (tnId != null) {
-            return PaymentResponse.builder()
-                    .id(tnId.getId())
-                    .paymentStatus(tnId.getPaymentStatus())
-                    .paymentTransactionId(tnId.getPaymentTransactionId())
-                    .build();
-        } else {
-            return PaymentResponse.builder().paymentTransactionId(paymentTransactionId).transactionStatus("Invalid TnId").build();
-        }
-    }
-
-    @Override
-    public PaymentResponse filterByPaymentTransactionStatus(String status) {
-       List <Payment> response = paymentRepository.findAllByPaymentStatusIgnoreCase(status);
-       response.forEach(e->System.err.println(e.getPaymentStatus()));
-        List<Payment> filterResponse = response.stream().map(this::mapToPaymentStatus).collect(Collectors.toList());
-        return PaymentResponse.builder()
-                .allPaymentStatus(filterResponse)
-                .build();
-    }
-
-    @Override
-    public PaymentResponse filterByOrderPaymentStatus(Integer orderId, String status) {
-        Payment order_id = paymentRepository.findByOrderId(orderId);
-        if(order_id!=null) {
-
-        }
-         Payment response = paymentRepository.findByOrderIdAndPaymentStatus(orderId, status);
-         return PaymentResponse.builder()
-                 .id(response.getId())
-                 .totalAmount(response.getOrderAmount())
-                 .orderId(response.getOrderId())
-                 .transactionStatus(response.getPaymentStatus())
-                 .paymentTransactionId(response.getPaymentTransactionId())
-                 .build();
-    }
-
-    @Override
-    public PaymentResponse filterByOrderPaymentStatusApplied(Integer orderId, String status) {
+    public PaymentResponse filterByOrderPaymentStatus(Integer orderId, Boolean paymentStatus) {
         Payment payment = paymentRepository.findByOrderId(orderId);
-        if(orderId!=null){
-            payment.setPaymentStatus(status);
+        System.err.println(payment + "orderId:" + orderId + "===" + "status: " + paymentStatus);
+        if (payment != null) {
+            payment.setPaymentStatus(paymentStatus);
+            System.err.println(payment.getPaymentStatus());
             paymentRepository.save(payment);
+            Integer id = orderId;
+            // rest API orderService
+            ProductOrder productOrder = restTemplate.getForObject(ORDER_BASE_URL,
+              ProductOrder.class,id,paymentStatus );
+            System.err.println(productOrder+ " productOrder "+productOrder.getMessage()
+            +","+productOrder.getMessage());
+            return PaymentResponse.builder()
+                    .paymentStatusMsg(productOrder.getMessage())
+                    .orderId(payment.getOrderId())
+                    .paymentStatus(payment.getPaymentStatus())
+                    .paymentTransactionId(payment.getPaymentTransactionId())
+                    .totalAmount(payment.getOrderAmount())
+                    .build();
         }
         return PaymentResponse.builder()
-                        .paymentStatus("Payment successfully ")
+                .paymentStatusMsg("Payment was field...")
                 .orderId(payment.getOrderId())
                 .build();
-    }
 
+    }
     private Payment mapToPaymentStatus(Payment payment) {
         return Payment.builder()
                 .id(payment.getId())

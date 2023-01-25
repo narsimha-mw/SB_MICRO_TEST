@@ -16,7 +16,6 @@ import java.util.List;
 public class OrdersController {
     @Autowired
     private OrdersService orderService;
-    private  static  final  String FALL_BACK_ORDER_SERVICES= "orderService";
     @GetMapping("/test-server")
     @ResponseStatus(HttpStatus.OK)
     public String testServer(){
@@ -24,11 +23,7 @@ public class OrdersController {
     }
     int count=1;
     @PostMapping("/save-order")
-//    @CircuitBreaker(name = FALL_BACK_ORDER_SERVICES,fallbackMethod = "callSaveOrderService")
-//    @Retry(name = FALL_BACK_ORDER_SERVICES,fallbackMethod = "callSaveOrderService")
-//    @RateLimiter(name = FALL_BACK_ORDER_SERVICES,fallbackMethod = "callSaveOrderService") // wait until time next call
     public OrderPaymentTransactionResponse saveOrder(@RequestBody OrderPaymentTransactionRequest request){
-
         System.out.println("Retry API flow"+ count++ + "time at "+ new Date());
         return orderService.savedOrder(request);
     }
@@ -37,5 +32,10 @@ public class OrdersController {
     public List<ProductOrder> fetchAllOrders(){
         return orderService.fetchAllOrders();
     }
-
+    @GetMapping("/orderId={id}&pay-status={paymentStatus}")
+    public OrderPaymentTransactionResponse filterByOrderPaymentStatus(@PathVariable(value = "id") Integer orderId,
+                                                                      @PathVariable(value = "paymentStatus") Boolean paymentStatus){
+        System.err.println(" order update status API call orderId:" + orderId + "status"+paymentStatus);
+        return orderService.filterByOrderPaymentStatus(orderId, paymentStatus);
+    }
 }

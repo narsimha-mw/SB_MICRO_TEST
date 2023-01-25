@@ -13,13 +13,9 @@ import java.util.List;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PaymentResponse {
-    private Integer id;
     private String paymentTransactionId;
-    private String paymentStatus;
+    private Boolean paymentStatus;
+    private String paymentStatusMsg;
     private double totalAmount;
     private int orderId;
-    private String transactionStatus;
-    private List<Payment> allPaymentStatus;
-    private String paymentMessage;
-
 }

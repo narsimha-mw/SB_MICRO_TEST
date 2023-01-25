@@ -27,5 +27,5 @@ public class Order {
     private int quantity;
     private Double price;
     @Column(name="payment_status")
-    private Enum paymentStatus;
+    private Boolean paymentStatus;
 }

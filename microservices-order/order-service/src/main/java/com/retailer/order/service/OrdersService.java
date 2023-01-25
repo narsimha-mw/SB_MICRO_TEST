@@ -12,6 +12,8 @@ public interface OrdersService {
     List<ProductOrder> fetchAllOrders();
 
     OrderPaymentTransactionResponse savedOrder(OrderPaymentTransactionRequest request);
+
+    OrderPaymentTransactionResponse filterByOrderPaymentStatus(Integer orderId, Boolean paymentStatus);
 //    OrdersResponse getByOrderId(String orderId);
 
 }

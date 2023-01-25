@@ -12,14 +12,14 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "PAYMENT")
+@Table(name = "payment")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Payment  implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name = "pay_status")
-    private String paymentStatus;
+    private Boolean paymentStatus;
     @Column(name = "pay_tnsID")
     private String paymentTransactionId;
     @NonNull
