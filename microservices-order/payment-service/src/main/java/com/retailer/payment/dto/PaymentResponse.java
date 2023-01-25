@@ -18,4 +18,5 @@ public class PaymentResponse {
     private String paymentStatusMsg;
     private double totalAmount;
     private int orderId;
+    
 }
