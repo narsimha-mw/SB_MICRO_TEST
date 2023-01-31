@@ -3,6 +3,7 @@ package com.retailer.order.service;
 import com.retailer.order.common.Payment;
 import com.retailer.order.dto.OrderPaymentTransactionRequest;
 import com.retailer.order.dto.OrderPaymentTransactionResponse;
+import com.retailer.order.dto.OrdersRequest;
 import com.retailer.order.model.ProductOrder;
 import com.retailer.order.repository.OrdersRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -19,37 +20,16 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 @RefreshScope
 @Slf4j
-public class OrdersServiceImpl implements  OrdersService{
+public class OrdersServiceImpl implements  OrdersService {
     private static final String PAYMENT_BASE_URL = "http://PAYMENT-SERVICE/api/v2/payment/pay";
     @Autowired
     private OrdersRepository orderRepository;
     @Autowired
     @Lazy
     private RestTemplate restTemplate;
-    Payment responseAPI =null;
+    Payment responseAPI = null;
     String message = null;
-    @Override
-    public OrderPaymentTransactionResponse filterByOrderPaymentStatus(Integer orderId, Boolean paymentStatus) {
-        System.err.println(" order update status API call filterByOrderPaymentStatus: " + orderId + " status: "+paymentStatus);
-    if(getFindByOrderId(orderId).isPresent()){
-    ProductOrder order = getFindByOrderId(orderId).get();
-    order.setOrderNumber(order.getOrderNumber());
-    order.setPrice(order.getPrice());
-    order.setQuantity(order.getQuantity());
-    order.setProductName(order.getProductName());
-    order.setPaymentStatus(paymentStatus);
-    System.err.println(" order update status API call :" + order.getPaymentStatus()+","+order.getOrderNumber());
 
-    orderRepository.save(order);
-    return OrderPaymentTransactionResponse.builder().message("Order/payment status updates success")
-            .build();
-}
-      return OrderPaymentTransactionResponse.builder().message("Order Payment status updated").build();
-   }
-    private Optional<ProductOrder> getFindByOrderId(Integer orderId){
-      return orderRepository.findByOrderNumber(orderId);
-
-    }
     @Override
     public List<ProductOrder> fetchAllOrders() {
         return orderRepository.findAll();
@@ -63,22 +43,18 @@ public class OrdersServiceImpl implements  OrdersService{
         order.setPaymentStatus(false);
         orderRepository.save(order);
         ProductOrder lastRowOrder = orderRepository.findTopByOrderByIdDesc();
-        System.err.println("lastRowOrder="+ lastRowOrder.getId()+";"+lastRowOrder.getProductName());
-        log.info("lastRowOrder=", lastRowOrder.getId()+" product name: "+lastRowOrder.getProductName());
+        log.info("lastRowOrder=", lastRowOrder.getId() + " product name: " + lastRowOrder.getProductName());
 
-        if(lastRowOrder!=null) {
-            System.err.println("Order row: "+ order.getPaymentStatus());
+        if (lastRowOrder != null) {
             Payment payment = request.getPayment();
             payment.setOrderId(order.getOrderNumber());
             payment.setOrderAmount(lastRowOrder.getPrice());
             payment.setPaymentStatus(order.getPaymentStatus());
-            System.err.println("Payment obj: "+ payment.getPaymentStatus()+" id: "+payment.getOrderId()
-            + "status: "+ payment.getPaymentStatus());
             // call Payment APi using REST Template
-           Payment responseAPI = restTemplate.postForObject(PAYMENT_BASE_URL,
+            Payment responseAPI = restTemplate.postForObject(PAYMENT_BASE_URL,
                     payment, Payment.class);
             if (!responseAPI.getPaymentStatus()) {
-                message = "This Order placed and no payment" +responseAPI.getOrderId() +"and transactionId" + payment.getPaymentTransactionId();
+                message = "This Order placed and no payment" + responseAPI.getOrderId() + "and transactionId" + payment.getPaymentTransactionId();
             } else {
                 message = "This Order payment was success" + responseAPI.getOrderId() + " and transactionId" + payment.getPaymentTransactionId();
             }
@@ -91,4 +67,24 @@ public class OrdersServiceImpl implements  OrdersService{
         return null;
     }
 
+    @Override
+    public OrderPaymentTransactionResponse filterByOrderPaymentStatus(Integer orderId, Boolean paymentStatus){
+        Optional<ProductOrder> po = getFindByOrderId(orderId);
+        if (po.isPresent()) {
+            ProductOrder order = po.get();
+            System.err.println("order "+ order);
+            order.setOrderNumber(order.getOrderNumber());
+            order.setPrice(order.getPrice());
+            order.setQuantity(order.getQuantity());
+            order.setProductName(order.getProductName());
+            order.setPaymentStatus(paymentStatus);
+            orderRepository.save(order);
+            return OrderPaymentTransactionResponse.builder().message("Order/payment status updates success")
+                    .build();
+        }
+        return OrderPaymentTransactionResponse.builder().message("Order Payment status updated").build();
+    }
+    private Optional<ProductOrder> getFindByOrderId(Integer orderId) {
+        return orderRepository.findByOrderNumber(orderId);
+    }
 }

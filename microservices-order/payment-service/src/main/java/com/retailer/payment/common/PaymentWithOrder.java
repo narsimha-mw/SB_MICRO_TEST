@@ -1,6 +1,5 @@
 package com.retailer.payment.common;
 
-import jakarta.persistence.Column;
 import lombok.*;
 
 @Setter
@@ -8,9 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductOrder {
+public class PaymentWithOrder {
     private int orderNumber;
-    private String message;
     private boolean paymentStatus;
-
 }

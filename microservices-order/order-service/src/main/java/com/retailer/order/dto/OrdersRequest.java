@@ -1,5 +1,6 @@
 package com.retailer.order.dto;
 
+import com.retailer.order.model.ProductOrder;
 import lombok.*;
 
 @Setter
@@ -8,7 +9,5 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class OrdersRequest {
-    private String orderNumber;
-    private int quantity;
-    private double price;
+    private ProductOrder orderIdWithStaus;
 }

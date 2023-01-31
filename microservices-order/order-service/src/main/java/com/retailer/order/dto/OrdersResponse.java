@@ -12,4 +12,5 @@ import java.util.List;
 @Builder
 public class OrdersResponse {
     private List<ProductOrder> productOrder;
+    private List<ProductOrder> item;
 }
