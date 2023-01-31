@@ -1,5 +1,6 @@
 package com.retailer.payment.service;
 
+import com.retailer.payment.common.PaymentWithOrder;
 import com.retailer.payment.common.ProductOrder;
 import com.retailer.payment.dto.PaymentResponse;
 import com.retailer.payment.model.Payment;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PaymentServiceImpl implements PaymentService {
     private static final String ORDER_BASE_URL = "http://ORDER-SERVICE/api/v2/order/orderId={id}&pay-status={message}";
+    private static final String ORDER_BASE_POST_URL = "http://ORDER-SERVICE/api/v2/order/updatePayment";
 
     @Autowired
     private PaymentRepository paymentRepository;
@@ -42,17 +44,27 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponse filterByOrderPaymentStatus(Integer orderId, Boolean paymentStatus) {
         Payment payment = paymentRepository.findByOrderId(orderId);
-        System.err.println(payment + "orderId:" + orderId + "===" + "status: " + paymentStatus);
         if (payment != null) {
+            System.err.println("orderId:" + orderId + "===" + "status: " + paymentStatus);
             payment.setPaymentStatus(paymentStatus);
             System.err.println(payment.getPaymentStatus());
             paymentRepository.save(payment);
             Integer id = orderId;
-            // rest API orderService
+            // rest API GET orderService
             ProductOrder productOrder = restTemplate.getForObject(ORDER_BASE_URL,
               ProductOrder.class,id,paymentStatus );
             System.err.println(productOrder+ " productOrder "+productOrder.getMessage()
             +","+productOrder.getMessage());
+//            rest API POST orderService
+//            ProductOrder response = ProductOrder.builder()
+//                    .orderNumber(id).paymentStatus(paymentStatus).build();
+//            System.err.println("Before API CALL"+
+//                    response.getOrderNumber()+";"+response.isPaymentStatus());
+//            ProductOrder productOrders = restTemplate.postForObject(ORDER_BASE_POST_URL,
+//                    response, ProductOrder.class);
+//
+//            System.err.println("productOrder "+productOrders.getMessage()
+//                    +","+productOrders.getMessage());
             return PaymentResponse.builder()
                     .paymentStatusMsg(productOrder.getMessage())
                     .orderId(payment.getOrderId())

@@ -13,7 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 @Table(name = "payment")
-@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonIgnoreProperties(ignoreUnknown = true)
 public class Payment  implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
