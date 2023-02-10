@@ -33,8 +33,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             MyAppUser myAppUser1 = MyAppUser.builder()
                     .userName(request.getUserName())
                     .userEmail(request.getUserEmail())
-//                    .userPassword(passwordEncoder.encode(request.getUserPassword()))
-                    .userPassword(request.getUserPassword())
+                    .userPassword(passwordEncoder.encode(request.getUserPassword()))
+//                    .userPassword(request.getUserPassword())
                     .role(Role.USER)
                     .build();
             userRepository.save(myAppUser1);

@@ -16,7 +16,7 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "my-app")
+@Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -24,8 +24,8 @@ public class MyAppUser implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer userId;
-    @Id
     @Email
+    @Id
     @Column(name = "email")
     private String userEmail;
     @Column(name = "password")
@@ -40,7 +40,6 @@ public class MyAppUser implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
-
     @Override
     public String getPassword() {
         return userPassword;
