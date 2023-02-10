@@ -1,4 +1,4 @@
-package com.retailer.cloudservicegateway;
+package com.retailer.gateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
