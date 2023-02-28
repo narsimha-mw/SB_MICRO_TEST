@@ -1,9 +1,9 @@
 package com.retailer.order.service;
 
-import com.retailer.order.common.Payment;
+import com.retailer.order.common.PaymentClient;
+import com.retailer.order.common.UserClient;
 import com.retailer.order.dto.OrderPaymentTransactionRequest;
 import com.retailer.order.dto.OrderPaymentTransactionResponse;
-import com.retailer.order.dto.OrdersRequest;
 import com.retailer.order.model.ProductOrder;
 import com.retailer.order.repository.OrdersRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -22,12 +24,14 @@ import java.util.concurrent.ThreadLocalRandom;
 @Slf4j
 public class OrdersServiceImpl implements  OrdersService {
     private static final String PAYMENT_BASE_URL = "http://PAYMENT-SERVICE/api/v2/payment/pay";
+    private static final String USER_BASE_URL = "http://USER-SERVICE/api/v2/user//getUser/email={userEmail}";
+
     @Autowired
     private OrdersRepository orderRepository;
     @Autowired
     @Lazy
     private RestTemplate restTemplate;
-    Payment responseAPI = null;
+    PaymentClient responseAPI = null;
     String message = null;
 
     @Override
@@ -41,18 +45,24 @@ public class OrdersServiceImpl implements  OrdersService {
         int orderNumber = ThreadLocalRandom.current().nextInt(100000, 1000000);
         order.setOrderNumber(orderNumber);
         order.setPaymentStatus(false);
+        Map<String, String> map = new HashMap<>();
+//        map.put("userEmail", userEmail);
+
+        UserClient[] userClients = restTemplate.getForObject(USER_BASE_URL, UserClient[].class, map);
+        // token based user get Id;
+    System.err.println("userClients"+ userClients);
+//        order.setUserId(1);
         orderRepository.save(order);
         ProductOrder lastRowOrder = orderRepository.findTopByOrderByIdDesc();
         log.info("lastRowOrder=", lastRowOrder.getId() + " product name: " + lastRowOrder.getProductName());
-
         if (lastRowOrder != null) {
-            Payment payment = request.getPayment();
+            PaymentClient payment = request.getPayment();
             payment.setOrderId(order.getOrderNumber());
             payment.setOrderAmount(lastRowOrder.getPrice());
             payment.setPaymentStatus(order.getPaymentStatus());
             // call Payment APi using REST Template
-            Payment responseAPI = restTemplate.postForObject(PAYMENT_BASE_URL,
-                    payment, Payment.class);
+            PaymentClient responseAPI = restTemplate.postForObject(PAYMENT_BASE_URL,
+                    payment, PaymentClient.class);
             if (!responseAPI.getPaymentStatus()) {
                 message = "This Order placed and no payment" + responseAPI.getOrderId() + "and transactionId" + payment.getPaymentTransactionId();
             } else {

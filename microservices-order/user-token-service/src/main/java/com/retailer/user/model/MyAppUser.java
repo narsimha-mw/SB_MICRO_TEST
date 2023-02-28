@@ -1,5 +1,6 @@
 package com.retailer.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -23,24 +23,30 @@ import java.util.Set;
 public class MyAppUser implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Id
     private Integer userId;
     @Email
-    @Id
+//    @Id
     @Column(name = "email")
     private String userEmail;
     @Column(name = "password")
     @Lob
+    @JsonIgnore
     private String userPassword;
     @Column(name = "name")
+    @JsonIgnore
     private String userName;
     @Column(name = "role")
+    @JsonIgnore
     private Role role;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
     @Override
+    @JsonIgnore
     public String getPassword() {
         return userPassword;
     }
@@ -51,21 +57,25 @@ public class MyAppUser implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return true;
     }

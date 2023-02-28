@@ -3,4 +3,4 @@ spring:
     name: USER-SERVICE
 
 server:
-  port: 2003
+  port: 2008

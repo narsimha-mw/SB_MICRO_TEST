@@ -1,19 +1,21 @@
 package com.retailer.order.controller;
 
+import com.retailer.order.config.TokenHeader;
 import com.retailer.order.dto.OrderPaymentTransactionRequest;
 import com.retailer.order.dto.OrderPaymentTransactionResponse;
-import com.retailer.order.dto.OrdersRequest;
 import com.retailer.order.dto.OrdersResponse;
 import com.retailer.order.model.ProductOrder;
 import com.retailer.order.service.OrdersService;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
+
 
 @RestController
 @RequestMapping("/api/v2/order")
@@ -21,17 +23,29 @@ import java.util.List;
 public class OrdersController {
     @Autowired
     private OrdersService orderService;
+    @Autowired
+    private TokenHeader tokenHeader;
     @GetMapping("/test-server")
     @ResponseStatus(HttpStatus.OK)
-    public String testServer(){
+    public String testServer(@RequestHeader (name = "Authorization") String jwtToken) throws UnsupportedEncodingException {
+        String[] chunks = jwtToken.split("\\.");
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+        String userInfo = new String(decoder.decode(chunks[1]));
+        System.err.println("userInfo= "+userInfo);
+        JSONObject jSONObject = new JSONObject(userInfo);
+        System.err.println(jSONObject+ "json "+ jSONObject.getString("sub"));
+
         return "orderService is up now today....";
     }
-    int count=1;
+    private static String decode(String encodedString) {
+        return new String(Base64.getUrlDecoder().decode(encodedString));
+    }
+
     @CrossOrigin
     @PostMapping(path="/save-order", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public OrderPaymentTransactionResponse saveOrder(@RequestBody OrderPaymentTransactionRequest request){
-        System.out.println("Retry API flow"+ count++ + "time at "+ new Date());
+    public OrderPaymentTransactionResponse saveOrder(@RequestBody OrderPaymentTransactionRequest request, HttpRequest httpRequest){
+        System.out.println("Retry API flow"+ httpRequest);
         return orderService.savedOrder(request);
     }
     @CrossOrigin

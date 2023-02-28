@@ -1,6 +1,6 @@
 package com.retailer.order.dto;
 
-import com.retailer.order.common.Payment;
+import com.retailer.order.common.PaymentClient;
 import com.retailer.order.model.ProductOrder;
 import lombok.*;
 
@@ -11,5 +11,5 @@ import lombok.*;
 @Builder
 public class OrderPaymentTransactionRequest {
     private ProductOrder productOrder;
-    private Payment payment;
+    private PaymentClient payment;
 }

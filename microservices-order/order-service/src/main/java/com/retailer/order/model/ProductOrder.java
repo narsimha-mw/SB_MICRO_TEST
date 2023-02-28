@@ -26,4 +26,5 @@ public class ProductOrder implements Serializable {
     private Double price;
     @Column(name="payment_status")
     private Boolean paymentStatus;
+    private int userId;
 }

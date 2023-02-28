@@ -1,7 +1,7 @@
 package com.retailer.order.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.retailer.order.common.Payment;
+import com.retailer.order.common.PaymentClient;
 import com.retailer.order.model.ProductOrder;
 import lombok.*;
 
@@ -16,7 +16,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrderPaymentTransactionResponse implements Serializable {
     private ProductOrder productOrder;
-    private Payment payment;
+    private PaymentClient payment;
     private String message;
-private List<Payment> paymentList;
+private List<PaymentClient> paymentClientList;
 }

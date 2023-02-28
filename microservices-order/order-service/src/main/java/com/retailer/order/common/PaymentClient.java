@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Payment {
+public class PaymentClient {
     private Integer id;
     private Boolean paymentStatus;
     private String paymentTransactionId;
