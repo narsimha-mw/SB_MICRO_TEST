@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: FILE-UPLOAD-SERVICE
+  servlet:
+     multipart:
+        max-file-size: 12MB
+        max-request-size: 2MB
+
+server:
+  port: 2004

@@ -1,0 +1,25 @@
+spring:
+  main:
+      web-application-type: reactive
+  application:
+    name: GATEWAY-SERVICE
+    spring:
+      main:
+        web-application-type=none:
+  cloud:
+    gateway:
+      routes:
+        - id: supervisor-services
+          uri: lb://SUPERVISOR-SERVICE
+          predicates:
+            - Path=/api/v2/supervisor/**
+        - id: file-upload-services
+          uri: lb://FILE_UPLOAD-SERVICE
+          predicates:
+            - Path=/api/v2/file/**
+        - id: performances-services
+          uri: lb://PERFORMANCES-SERVICE
+          predicates:
+            - Path=/api/v2/performances/**
+server:
+  port: 2002
