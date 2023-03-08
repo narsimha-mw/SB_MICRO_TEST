@@ -18,10 +18,7 @@
 		<module>eureka-registry-management</module>
 		<module>config-management</module>
 		<module>gateway-management</module>
-		<module>file-management</module>
 		<module>supervisor-management</module>
-        <module>user-token-management</module>
-		<module>performances-management</module>
 	</modules>
 	<properties>
 		<java.version>11</java.version>

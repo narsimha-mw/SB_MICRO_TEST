@@ -5,7 +5,6 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-#    url: jdbc:mysql://localhost:3306/my-test?allowPublicKeyRetrieval=true&useSSL=false
     url: jdbc:mysql://localhost:3306/gcp_ics?allowPublicKeyRetrieval=true&useSSL=false
 
     username: root
@@ -20,11 +19,3 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:2000/eureka/
-
-microservices:
-  payment-service:
-    endpoints:
-      uri: http://PAYMENT-SERVICE/api/v2/payment/pay
-  order-service:
-    endpoints:
-      uri: http://ORDER-SERVICE/api/v2/order/all
